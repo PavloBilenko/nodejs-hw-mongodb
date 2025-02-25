@@ -12,10 +12,8 @@ const setupServer = () => {
   app.use(express.json());
   app.use(pino());
 
-  // Підключення маршрутів для контактів
-  app.use('/contacts', contactsRouter); // Залишаємо один правильний шлях
+  app.use('/contacts', contactsRouter);
 
-  // Обробка неіснуючих маршрутів
   app.use(notFoundHandler);
   app.use(errorHandler);
 

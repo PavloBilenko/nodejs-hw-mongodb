@@ -1,7 +1,9 @@
 import Contact from '../models/contact.js';
+import mongoose from 'mongoose';
+import createError from 'http-errors';
 
 // Отримати всі контакти
-export const getAllContacts = async (req, res) => {
+export const getAllContacts = async (req, res, next) => {
   try {
     const contacts = await Contact.find();
     res.json({
@@ -10,30 +12,46 @@ export const getAllContacts = async (req, res) => {
       data: contacts,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
+    next(createError(500, 'Failed to retrieve contacts'));
   }
 };
 
 // Отримати контакт за ID
-export const getContactById = async (req, res) => {
+export const getContactById = async (req, res, next) => {
   try {
-    const contact = await Contact.findById(req.params.contactId);
-    if (!contact) {
-      return res.status(404).json({ message: 'Contact not found' });
+    const { contactId } = req.params;
+
+    // Перевірка валідності ObjectId
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return next(createError(400, 'Invalid contact ID format'));
     }
+
+    const contact = await Contact.findById(contactId);
+    if (!contact) {
+      return next(createError(404, 'Contact not found'));
+    }
+
     res.json({
       status: 200,
-      message: `Successfully found contact with id ${req.params.contactId}!`,
+      message: `Successfully found contact with id ${contactId}!`,
       data: contact,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error' });
+    next(error);
   }
 };
 
 // Створити новий контакт
-export const createContact = async (req, res) => {
+export const createContact = async (req, res, next) => {
   try {
+    const { name, phoneNumber, contactType } = req.body;
+    if (!name || !phoneNumber || !contactType) {
+      throw createError(
+        400,
+        'Missing required fields: name, phoneNumber, contactType',
+      );
+    }
+
     const newContact = await Contact.create(req.body);
     res.status(201).json({
       status: 201,
@@ -41,52 +59,58 @@ export const createContact = async (req, res) => {
       data: newContact,
     });
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: 'Failed to create contact', error: error.message });
+    next(createError(400, `Failed to create contact: ${error.message}`));
   }
 };
 
 // Оновити контакт за ID
-export const updateContact = async (req, res) => {
+export const updateContact = async (req, res, next) => {
   try {
+    const { contactId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return next(createError(400, 'Invalid contact ID format'));
+    }
+
     const updatedContact = await Contact.findByIdAndUpdate(
-      req.params.contactId,
+      contactId,
       req.body,
       { new: true },
     );
     if (!updatedContact) {
-      return res.status(404).json({ message: 'Contact not found' });
+      return next(createError(404, 'Contact not found'));
     }
+
     res.json({
       status: 200,
-      message: `Successfully updated contact with id ${req.params.contactId}!`,
+      message: `Successfully updated contact with id ${contactId}!`,
       data: updatedContact,
     });
   } catch (error) {
-    res
-      .status(400)
-      .json({ message: 'Failed to update contact', error: error.message });
+    next(createError(400, `Failed to update contact: ${error.message}`));
   }
 };
 
 // Видалити контакт за ID
-export const deleteContact = async (req, res) => {
+export const deleteContact = async (req, res, next) => {
   try {
-    const deletedContact = await Contact.findByIdAndDelete(
-      req.params.contactId,
-    );
-    if (!deletedContact) {
-      return res.status(404).json({ message: 'Contact not found' });
+    const { contactId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(contactId)) {
+      return next(createError(400, 'Invalid contact ID format'));
     }
-    res.json({
+
+    const deletedContact = await Contact.findByIdAndDelete(contactId);
+    if (!deletedContact) {
+      return next(createError(404, 'Contact not found'));
+    }
+
+    res.status(200).json({
       status: 200,
-      message: `Successfully deleted contact with id ${req.params.contactId}!`,
+      message: `Successfully deleted contact with id ${contactId}!`,
       data: deletedContact,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Failed to delete contact', error: error.message });
+    next(createError(500, `Failed to delete contact: ${error.message}`));
   }
 };
