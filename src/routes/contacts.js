@@ -4,7 +4,6 @@ import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 const router = Router();
 
-// Роути для контактів
 router.get('/', ctrlWrapper(contactsController.getAllContacts));
 router.get('/:contactId', ctrlWrapper(contactsController.getContactById));
 router.post('/', ctrlWrapper(contactsController.createContact));
