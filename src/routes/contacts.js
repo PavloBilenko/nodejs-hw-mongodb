@@ -4,7 +4,7 @@ import Contact from '../models/contact.js';
 const router = Router();
 
 // GET /contacts - Отримати всі контакти
-router.get('/', async (req, res) => {
+router.get('/api/contacts', async (req, res) => {
   try {
     const contacts = await Contact.find();
     res.json({
