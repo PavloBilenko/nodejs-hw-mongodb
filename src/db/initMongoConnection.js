@@ -2,11 +2,10 @@ import mongoose from 'mongoose';
 
 async function initMongoConnection() {
   try {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      user: process.env.MONGODB_USER,
-      pass: process.env.MONGODB_PASSWORD,
-      dbName: process.env.MONGODB_DB,
-    });
+    const mongoURI = `mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWORD}@cluster0.eop3g.mongodb.net/${process.env.MONGODB_DB}?retryWrites=true&w=majority`;
+
+    await mongoose.connect(mongoURI);
+
     console.log('✅ Mongo connection successfully established!');
   } catch (error) {
     console.error('❌ Error connecting to MongoDB:', error.message);
