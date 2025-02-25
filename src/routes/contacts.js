@@ -3,8 +3,8 @@ import Contact from '../models/contact.js';
 
 const router = Router();
 
-// GET /contacts - Отримати всі контакти
-router.get('/api/contacts', async (req, res) => {
+// Отримати всі контакти (GET /api/contacts)
+router.get('/', async (req, res) => {
   try {
     const contacts = await Contact.find();
     res.json({
@@ -17,7 +17,7 @@ router.get('/api/contacts', async (req, res) => {
   }
 });
 
-// GET /contacts/:contactId - Отримати контакт за ID
+// Отримати один контакт за ID (GET /api/contacts/:contactId)
 router.get('/:contactId', async (req, res) => {
   try {
     const contact = await Contact.findById(req.params.contactId);
@@ -34,7 +34,7 @@ router.get('/:contactId', async (req, res) => {
   }
 });
 
-// POST /contacts - Створити новий контакт
+// Створити новий контакт (POST /api/contacts)
 router.post('/', async (req, res) => {
   try {
     const newContact = await Contact.create(req.body);
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH /contacts/:contactId - Оновити контакт за ID
+// Оновити контакт за ID (PATCH /api/contacts/:contactId)
 router.patch('/:contactId', async (req, res) => {
   try {
     const updatedContact = await Contact.findByIdAndUpdate(
@@ -73,7 +73,7 @@ router.patch('/:contactId', async (req, res) => {
   }
 });
 
-// DELETE /contacts/:contactId - Видалити контакт за ID
+// Видалити контакт (DELETE /api/contacts/:contactId)
 router.delete('/:contactId', async (req, res) => {
   try {
     const deletedContact = await Contact.findByIdAndDelete(
@@ -82,11 +82,7 @@ router.delete('/:contactId', async (req, res) => {
     if (!deletedContact) {
       return res.status(404).json({ message: 'Contact not found' });
     }
-    res.json({
-      status: 200,
-      message: `Successfully deleted contact with id ${req.params.contactId}!`,
-      data: deletedContact,
-    });
+    res.status(204).send();
   } catch (error) {
     res
       .status(500)
