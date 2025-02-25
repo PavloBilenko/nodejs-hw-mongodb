@@ -4,6 +4,10 @@ import createError from 'http-errors';
 
 // Отримати всі контакти
 export const getAllContacts = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    throw createError(401, 'User not authenticated');
+  }
+
   const {
     page = 1,
     perPage = 10,
@@ -16,8 +20,8 @@ export const getAllContacts = async (req, res) => {
   const skip = (page - 1) * perPage;
   const sortDirection = sortOrder === 'desc' ? -1 : 1;
 
-  // Фільтрація
-  const filter = {};
+  // Фільтрація за userId
+  const filter = { userId: req.user._id };
   if (type) filter.contactType = type;
   if (isFavourite !== undefined) filter.isFavourite = isFavourite === 'true';
 
@@ -46,13 +50,21 @@ export const getAllContacts = async (req, res) => {
 
 // Отримати контакт за ID
 export const getContactById = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    throw createError(401, 'User not authenticated');
+  }
+
   const { contactId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(contactId)) {
     throw createError(400, 'Invalid contact ID format');
   }
 
-  const contact = await Contact.findById(contactId);
+  const contact = await Contact.findOne({
+    _id: contactId,
+    userId: req.user._id,
+  });
+
   if (!contact) {
     throw createError(404, 'Contact not found');
   }
@@ -66,6 +78,10 @@ export const getContactById = async (req, res) => {
 
 // Створити новий контакт
 export const createContact = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    throw createError(401, 'User not authenticated');
+  }
+
   const { name, phoneNumber, contactType, email, isFavourite } = req.body;
 
   if (!name || !phoneNumber || !contactType) {
@@ -81,6 +97,7 @@ export const createContact = async (req, res) => {
     contactType,
     email: email || '',
     isFavourite: isFavourite || false,
+    userId: req.user._id,
   });
 
   res.status(201).json({
@@ -92,6 +109,10 @@ export const createContact = async (req, res) => {
 
 // Оновити контакт за ID
 export const updateContact = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    throw createError(401, 'User not authenticated');
+  }
+
   const { contactId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(contactId)) {
@@ -110,9 +131,12 @@ export const updateContact = async (req, res) => {
     );
   }
 
-  const updatedContact = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+  const updatedContact = await Contact.findOneAndUpdate(
+    { _id: contactId, userId: req.user._id },
+    req.body,
+    { new: true },
+  );
+
   if (!updatedContact) {
     throw createError(404, 'Contact not found');
   }
@@ -126,13 +150,21 @@ export const updateContact = async (req, res) => {
 
 // Видалити контакт за ID
 export const deleteContact = async (req, res) => {
+  if (!req.user || !req.user._id) {
+    throw createError(401, 'User not authenticated');
+  }
+
   const { contactId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(contactId)) {
     throw createError(400, 'Invalid contact ID format');
   }
 
-  const deletedContact = await Contact.findByIdAndDelete(contactId);
+  const deletedContact = await Contact.findOneAndDelete({
+    _id: contactId,
+    userId: req.user._id,
+  });
+
   if (!deletedContact) {
     throw createError(404, 'Contact not found');
   }

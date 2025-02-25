@@ -3,12 +3,15 @@ import * as contactsController from '../controllers/contacts.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
 import {
   createContactSchema,
   updateContactSchema,
 } from '../validators/contactValidator.js';
 
 const router = Router();
+
+router.use(authenticate); // Захист усіх роутів
 
 router.get('/', ctrlWrapper(contactsController.getAllContacts));
 router.get(
