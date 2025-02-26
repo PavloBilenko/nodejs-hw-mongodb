@@ -11,25 +11,30 @@ import {
 
 const router = Router();
 
-router.use(authenticate); // Захист усіх роутів
+// Захист усіх роутів за допомогою middleware `authenticate`
+router.use(authenticate);
 
 router.get('/', ctrlWrapper(contactsController.getAllContacts));
+
 router.get(
   '/:contactId',
   isValidId,
   ctrlWrapper(contactsController.getContactById),
 );
+
 router.post(
   '/',
   validateBody(createContactSchema),
   ctrlWrapper(contactsController.createContact),
 );
+
 router.patch(
   '/:contactId',
   isValidId,
   validateBody(updateContactSchema),
   ctrlWrapper(contactsController.updateContact),
 );
+
 router.delete(
   '/:contactId',
   isValidId,
