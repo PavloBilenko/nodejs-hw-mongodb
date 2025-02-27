@@ -33,3 +33,5 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+  schemas:
+    $ref: "./swagger/components/schemas.yaml"
