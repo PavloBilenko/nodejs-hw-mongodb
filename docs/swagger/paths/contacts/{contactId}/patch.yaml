@@ -1,15 +1,16 @@
 patch:
   tags:
     - Contacts
-  summary: Update a contact by ID
+  summary: Update a contact
   operationId: updateContact
-  description: Updates details of an existing contact
+  description: Updates an existing contact
   security:
     - bearerAuth: []
   parameters:
     - name: contactId
       in: path
       required: true
+      description: ID of the contact to update
       schema:
         type: string
   requestBody:
@@ -17,14 +18,14 @@ patch:
     content:
       application/json:
         schema:
-          $ref: "../../../components/schemas.yaml#/Contact"
+          $ref: "../../components/schemas.yaml#/Contact"
   responses:
     200:
       description: Contact updated successfully
       content:
         application/json:
           schema:
-            $ref: "../../../components/schemas.yaml#/Contact"
+            $ref: "../../components/schemas.yaml#/Contact"
     400:
       description: Invalid request data
     404:

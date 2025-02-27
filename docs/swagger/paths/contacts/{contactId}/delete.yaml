@@ -1,15 +1,16 @@
 delete:
   tags:
     - Contacts
-  summary: Delete a contact by ID
+  summary: Delete a contact
   operationId: deleteContact
-  description: Removes a contact from the database
+  description: Deletes an existing contact
   security:
     - bearerAuth: []
   parameters:
     - name: contactId
       in: path
       required: true
+      description: ID of the contact to delete
       schema:
         type: string
   responses:
