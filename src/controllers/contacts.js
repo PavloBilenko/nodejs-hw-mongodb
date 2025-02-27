@@ -1,6 +1,14 @@
 import Contact from '../models/contact.js';
 import mongoose from 'mongoose';
 import createError from 'http-errors';
+import cloudinary from 'cloudinary';
+
+// Налаштування Cloudinary
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Отримати всі контакти
 export const getAllContacts = async (req, res) => {
@@ -91,6 +99,23 @@ export const createContact = async (req, res) => {
     );
   }
 
+  let photoUrl = '';
+
+  if (req.file) {
+    const uploadResponse = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.v2.uploader.upload_stream(
+        { folder: 'contacts' },
+        (error, result) => {
+          if (error) reject(createError(500, 'Failed to upload image'));
+          else resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
+    photoUrl = uploadResponse;
+  }
+
   const newContact = await Contact.create({
     name,
     phoneNumber,
@@ -98,6 +123,7 @@ export const createContact = async (req, res) => {
     email: email || '',
     isFavourite: isFavourite || false,
     userId: req.user._id,
+    photo: photoUrl,
   });
 
   res.status(201).json({
@@ -119,7 +145,7 @@ export const updateContact = async (req, res) => {
     throw createError(400, 'Invalid contact ID format');
   }
 
-  if (Object.keys(req.body).length === 0) {
+  if (Object.keys(req.body).length === 0 && !req.file) {
     throw createError(400, 'No fields provided for update');
   }
 
@@ -131,9 +157,31 @@ export const updateContact = async (req, res) => {
     );
   }
 
+  let photoUrl = '';
+
+  if (req.file) {
+    const uploadResponse = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.v2.uploader.upload_stream(
+        { folder: 'contacts' },
+        (error, result) => {
+          if (error) reject(createError(500, 'Failed to upload image'));
+          else resolve(result.secure_url);
+        },
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
+    photoUrl = uploadResponse;
+  }
+
+  const updatedData = { ...req.body };
+  if (photoUrl) {
+    updatedData.photo = photoUrl;
+  }
+
   const updatedContact = await Contact.findOneAndUpdate(
     { _id: contactId, userId: req.user._id },
-    req.body,
+    updatedData,
     { new: true },
   );
 
@@ -169,6 +217,11 @@ export const deleteContact = async (req, res) => {
     throw createError(404, 'Contact not found');
   }
 
-  // Відповідно до завдання, статус 204 і без тіла відповіді
+  // Видалити фото з Cloudinary, якщо є
+  if (deletedContact.photo) {
+    const publicId = deletedContact.photo.split('/').pop().split('.')[0];
+    await cloudinary.v2.uploader.destroy(publicId);
+  }
+
   res.status(204).send();
 };

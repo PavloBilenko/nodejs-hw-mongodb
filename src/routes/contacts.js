@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import multer from 'multer';
 import * as contactsController from '../controllers/contacts.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateBody } from '../middlewares/validateBody.js';
@@ -8,6 +9,10 @@ import {
   createContactSchema,
   updateContactSchema,
 } from '../validators/contactValidator.js';
+
+// Налаштування Multer для завантаження файлів
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const router = Router();
 
@@ -24,6 +29,7 @@ router.get(
 
 router.post(
   '/',
+  upload.single('photo'), // Додаємо підтримку завантаження фото
   validateBody(createContactSchema),
   ctrlWrapper(contactsController.createContact),
 );
@@ -31,6 +37,7 @@ router.post(
 router.patch(
   '/:contactId',
   isValidId,
+  upload.single('photo'), // Додаємо підтримку оновлення фото
   validateBody(updateContactSchema),
   ctrlWrapper(contactsController.updateContact),
 );
