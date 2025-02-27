@@ -1,0 +1,30 @@
+get:
+  tags:
+    - Contacts
+  summary: Get all contacts
+  operationId: getAllContacts
+  description: Retrieves a list of all contacts
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      description: Page number
+      schema:
+        type: integer
+    - name: perPage
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+  responses:
+    200:
+      description: List of contacts
+      content:
+        application/json:
+          schema:
+            $ref: "../../components/schemas.yaml#/ContactList"
+    401:
+      description: Unauthorized
+    500:
+      description: Internal Server Error
