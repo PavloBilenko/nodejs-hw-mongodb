@@ -1,36 +1,36 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: Contacts API
+  title: Contacts Manager App
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: API для роботи з контактами
+  description: Contacts operations
+
 tags:
   - name: Contacts
-    description: Операції з контактами
-  - name: Auth
-    description: Аутентифікація користувачів
+    description: Operations with contacts
+
 servers:
   - url: http://localhost:3000
-  - url: https://hw6-email-and-images-pvzw.onrender.com
+  - url: https://hw7-swagger-qzew.onrender.com
+
 paths:
   /contacts:
     get:
-      $ref: './swagger/paths/contacts/get.yaml'
+      $ref: '../swagger/paths/contacts/get.yaml'
     post:
-      $ref: './swagger/paths/contacts/post.yaml'
-  /contacts/{contactId}:
+      $ref: '../swagger/paths/contacts/post.yaml'
+  /contacts/{id}:
     get:
-      $ref: './swagger/paths/contacts/{contactId}/get.yaml'
+      $ref: '../swagger/paths/contacts/{id}/get.yaml'
     patch:
-      $ref: './swagger/paths/contacts/{contactId}/patch.yaml'
+      $ref: '../swagger/paths/contacts/{id}/patch.yaml'
     delete:
-      $ref: './swagger/paths/contacts/{contactId}/delete.yaml'
+      $ref: '../swagger/paths/contacts/{id}/delete.yaml'
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-  schemas:
-    $ref: './swagger/components/schemas.yaml'
