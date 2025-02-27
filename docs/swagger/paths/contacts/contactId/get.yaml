@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Contacts
+  summary: Get a contact by ID
+  operationId: getContactById
+  description: Retrieves a specific contact using its ID
+  security:
+    - bearerAuth: []
+  parameters:
+    - name: contactId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    200:
+      description: Contact found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../components/schemas.yaml#/Contact"
+    404:
+      description: Contact not found
+    401:
+      description: Unauthorized
+    500:
+      description: Internal Server Error

@@ -23,7 +23,9 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../../components/schemas.yaml#/ContactList"
+            type: array
+            items:
+              $ref: "../../components/schemas.yaml#/Contact"
     401:
       description: Unauthorized
     500:
