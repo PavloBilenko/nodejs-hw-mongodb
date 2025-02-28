@@ -26,174 +26,34 @@
   "paths": {
     "/contacts": {
       "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Get all contacts",
+        "summary": "Отримати всі контакти",
         "operationId": "getAllContacts",
-        "description": "Retrieve a list of all contacts with pagination, sorting, and filtering.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "page",
-            "schema": {
-              "type": "integer",
-              "example": 1
-            }
-          },
-          {
-            "in": "query",
-            "name": "perPage",
-            "schema": {
-              "type": "integer",
-              "example": 7
-            }
-          },
-          {
-            "in": "query",
-            "name": "sortBy",
-            "schema": {
-              "type": "string",
-              "example": "name"
-            },
-            "description": "The field to sort by ('name', 'phoneNumber')."
-          },
-          {
-            "in": "query",
-            "name": "sortOrder",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "example": "asc"
-            },
-            "description": "The sorting order ('asc' or 'desc')."
-          },
-          {
-            "in": "query",
-            "name": "type",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "work",
-                "personal",
-                "home"
-              ]
-            }
-          },
-          {
-            "in": "query",
-            "name": "isFavourite",
-            "schema": {
-              "type": "boolean"
-            },
-            "description": "Filter by favorite status."
-          }
-        ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved the contacts list",
+            "description": "Список контактів",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully found contacts!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "required": [
-                        "data",
-                        "page",
-                        "perPage",
-                        "totalItems",
-                        "totalPages",
-                        "hasNextPage",
-                        "hasPreviousPage"
-                      ],
-                      "properties": {
-                        "data": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/contact"
-                          }
-                        },
-                        "page": {
-                          "type": "integer",
-                          "example": 1
-                        },
-                        "perPage": {
-                          "type": "integer",
-                          "example": 10
-                        },
-                        "totalItems": {
-                          "type": "integer",
-                          "example": 15
-                        },
-                        "totalPages": {
-                          "type": "integer",
-                          "example": 10
-                        },
-                        "hasNextPage": {
-                          "type": "boolean",
-                          "example": true
-                        },
-                        "hasPreviousPage": {
-                          "type": "boolean",
-                          "example": false
-                        }
-                      }
-                    }
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Contact"
                   }
                 }
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
           "500": {
-            "$ref": "#/components/responses/500"
+            "description": "Внутрішня помилка сервера"
           }
         }
       },
       "post": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Create a new contact",
+        "summary": "Створити новий контакт",
         "operationId": "createContact",
-        "description": "Add a new contact to the list.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
-            "multipart/form-data": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "required": [
@@ -204,22 +64,19 @@
                 ],
                 "properties": {
                   "name": {
-                    "description": "Contact name",
                     "type": "string",
-                    "example": "Ivan Pele"
+                    "description": "Ім'я контакту"
                   },
                   "phoneNumber": {
-                    "description": "Contact phone",
                     "type": "string",
-                    "example": "+380975554532"
+                    "description": "Номер телефону"
                   },
                   "email": {
-                    "description": "Contact email address",
                     "type": "string",
-                    "example": "ivanpele@gmail.com"
+                    "description": "Email"
                   },
                   "contactType": {
-                    "description": "Contact type",
+                    "type": "string",
                     "enum": [
                       "work",
                       "personal",
@@ -233,278 +90,127 @@
         },
         "responses": {
           "201": {
-            "description": "Successfully created a new contact",
+            "description": "Успішно створено контакт",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": "201"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully created a contact"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Contact"
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
           }
         }
       }
     },
     "/contacts/{id}": {
       "get": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Get contact by id",
-        "operationId": "getContact",
-        "description": "Retrieve contact details by ID.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
+        "summary": "Отримати контакт за ID",
+        "operationId": "getContactById",
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
-            },
-            "example": "67ca67e7ae7f10c25b566655"
+              "type": "string",
+              "example": "67ca67e7ae7f10c25b566655"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved contact",
+            "description": "Знайдено контакт",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Successfully found contact!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Contact"
                 }
               }
             }
           },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
           "404": {
-            "$ref": "#/components/responses/404"
+            "description": "Контакт не знайдено"
           },
           "500": {
-            "$ref": "#/components/responses/500"
+            "description": "Внутрішня помилка сервера"
           }
         }
       },
       "patch": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Update a contact",
+        "summary": "Оновити контакт",
         "operationId": "updateContact",
-        "description": "Update an existing contact's details.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
-            },
-            "example": "67ca67e7ae7f10c25b566655"
+              "type": "string",
+              "example": "67ca67e7ae7f10c25b566655"
+            }
           }
         ],
         "requestBody": {
-          "required": true,
+          "required": false,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "name": {
                     "type": "string",
-                    "example": "Ivan Pele"
+                    "description": "Ім'я контакту"
                   },
                   "phoneNumber": {
                     "type": "string",
-                    "example": 380998877900
+                    "description": "Номер телефону"
                   },
                   "email": {
                     "type": "string",
-                    "example": "ivanpele@gmail.com"
+                    "description": "Email"
                   },
                   "contactType": {
                     "type": "string",
-                    "example": "home"
-                  },
-                  "isFavourite": {
-                    "type": "boolean",
-                    "example": false
+                    "enum": [
+                      "work",
+                      "personal",
+                      "home"
+                    ]
                   }
-                },
-                "required": []
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Contact successfully updated",
+            "description": "Успішно оновлено контакт",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Contact successfully updated!"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Contact"
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
           }
         }
       },
       "delete": {
-        "tags": [
-          "Contacts"
-        ],
-        "summary": "Delete contact by id",
+        "summary": "Видалити контакт",
         "operationId": "deleteContact",
-        "description": "Remove a specific contact by its ID.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "parameters": [
           {
-            "in": "path",
             "name": "id",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"
-            },
-            "example": "67ca67e7ae7f10c25b566655"
+            }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successfully deleted the contact",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "status",
-                    "message",
-                    "data"
-                  ],
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Contact successfully deleted"
-                    },
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/contact"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "401": {
-            "$ref": "#/components/responses/401"
-          },
-          "404": {
-            "$ref": "#/components/responses/404"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
+          "204": {
+            "description": "Контакт успішно видалено"
           }
         }
       }
@@ -518,204 +224,32 @@
       }
     },
     "schemas": {
-      "contact": {
+      "Contact": {
         "type": "object",
-        "required": [
-          "_id",
-          "name",
-          "phoneNumber",
-          "email",
-          "isFavourite",
-          "contactType"
-        ],
         "properties": {
-          "_id": {
-            "description": "Contact's id",
+          "id": {
             "type": "string",
-            "example": "679ca01a791a37e1a64e5d7b"
+            "example": "67ca67e7ae7f10c25b566655"
           },
           "name": {
-            "description": "Contact's name",
             "type": "string",
-            "example": "Ivan Pele"
+            "example": "Іван Петров"
           },
           "phoneNumber": {
-            "description": "Contact's number",
             "type": "string",
-            "example": 380975554431
+            "example": "+380975554532"
           },
           "email": {
-            "description": "Contact's email",
             "type": "string",
             "example": "ivanpele@gmail.com"
           },
-          "isFavourite": {
-            "description": "Whether the contact is favorite or not",
-            "type": "boolean",
-            "example": true
-          },
           "contactType": {
-            "description": "Contact's type",
             "type": "string",
             "enum": [
+              "work",
               "personal",
-              "home",
-              "work"
+              "home"
             ]
-          },
-          "photo": {
-            "description": "Link to contact's photo",
-            "type": "string",
-            "example": "https://res.cloudinary.com/dcmygtlyh/image/upload/v1738875474/t8x8g4ph2jwns18rb3wb.jpg"
-          }
-        }
-      }
-    },
-    "responses": {
-      "400": {
-        "description": "Missing or invalid data",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 400
-                },
-                "message": {
-                  "type": "string",
-                  "example": "Missing or invalid data"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Bad request"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "401": {
-        "description": "UnauthorizedError",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 401
-                },
-                "message": {
-                  "type": "string",
-                  "example": "UnauthorizedError"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Access token expired"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "404": {
-        "description": "Contact not found",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message",
-                "data"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 404
-                },
-                "message": {
-                  "type": "string",
-                  "example": "Contact not found"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Access token expired"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "500": {
-        "description": "Internal Server Error",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "required": [
-                "status",
-                "message"
-              ],
-              "properties": {
-                "status": {
-                  "type": "integer",
-                  "example": 500
-                },
-                "message": {
-                  "type": "string",
-                  "example": "Internal Server Error"
-                },
-                "data": {
-                  "type": "object",
-                  "required": [
-                    "message"
-                  ],
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Something went wrong"
-                    }
-                  }
-                }
-              }
-            }
           }
         }
       }

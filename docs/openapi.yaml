@@ -2,13 +2,36 @@ openapi: 3.1.0
 info:
   version: 1.0.0
   title: Contacts Manager App
-  description: API для керування контактами
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: Contacts operations
+
+tags:
+  - name: Contacts
+    description: Operations with contacts
 
 servers:
   - url: http://localhost:3000
+  - url: https://hw7-swagger-qzew.onrender.com
 
 paths:
   /contacts:
+    get:
+      summary: Отримати всі контакти
+      operationId: getAllContacts
+      responses:
+        200:
+          description: Список контактів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contact"
+        500:
+          description: Внутрішня помилка сервера
+
     post:
       summary: Створити новий контакт
       operationId: createContact
@@ -18,6 +41,11 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
+                - phoneNumber
+                - email
+                - contactType
               properties:
                 name:
                   type: string
@@ -37,23 +65,43 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 201
-                  message:
-                    type: string
-                    example: Successfully created a contact!
-                  data:
-                    $ref: "#/components/schemas/Contact"
+                $ref: "#/components/schemas/Contact"
 
   /contacts/{id}:
+    get:
+      summary: Отримати контакт за ID
+      operationId: getContactById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67ca67e7ae7f10c25b566655"
+      responses:
+        200:
+          description: Знайдено контакт
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
+        404:
+          description: Контакт не знайдено
+        500:
+          description: Внутрішня помилка сервера
+
     patch:
       summary: Оновити контакт
       operationId: updateContact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67ca67e7ae7f10c25b566655"
       requestBody:
-        required: true
+        required: false
         content:
           multipart/form-data:
             schema:
@@ -77,16 +125,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    example: 200
-                  message:
-                    type: string
-                    example: Successfully updated the contact!
-                  data:
-                    $ref: "#/components/schemas/Contact"
+                $ref: "#/components/schemas/Contact"
 
     delete:
       summary: Видалити контакт
@@ -102,6 +141,11 @@ paths:
           description: Контакт успішно видалено
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
   schemas:
     Contact:
       type: object
