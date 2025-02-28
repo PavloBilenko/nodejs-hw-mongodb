@@ -7,13 +7,24 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import cookieParser from 'cookie-parser';
 import authRouter from './routes/auth.js';
 import swaggerUi from 'swagger-ui-express';
-import YAML from 'yamljs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+// Отримуємо кореневий шлях до файлу
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const setupServer = () => {
   const app = express();
 
-  // Завантаження документації Swagger
-  const swaggerDocument = YAML.load('./docs/openapi.yaml');
+  // Завантаження Swagger JSON
+  const swaggerPath = path.join(__dirname, '../docs/swagger.json');
+  if (!fs.existsSync(swaggerPath)) {
+    console.error('❌ Файл swagger.json не знайдено!');
+    process.exit(1);
+  }
+  const swaggerDocument = JSON.parse(fs.readFileSync(swaggerPath, 'utf-8'));
 
   // Middleware
   app.use(cors());
