@@ -1,51 +1,88 @@
 import { Router } from 'express';
+import Contact from '../models/contact.js';
 import multer from 'multer';
-import * as contactsController from '../controllers/contacts.js';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-import { validateBody } from '../middlewares/validateBody.js';
-import { isValidId } from '../middlewares/isValidId.js';
-import { authenticate } from '../middlewares/authenticate.js';
-import {
-  createContactSchema,
-  updateContactSchema,
-} from '../validators/contactValidator.js';
 
-// Налаштування Multer для завантаження файлів
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
+const upload = multer();
 const router = Router();
 
-// Захист усіх роутів за допомогою middleware `authenticate`
-router.use(authenticate);
+// Отримати всі контакти
+router.get('/', async (req, res) => {
+  try {
+    const contacts = await Contact.find();
+    res.json({
+      status: 200,
+      message: 'Successfully found contacts!',
+      data: contacts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
-router.get('/', ctrlWrapper(contactsController.getAllContacts));
+// Створити новий контакт
+router.post('/', async (req, res) => {
+  try {
+    const { name, phoneNumber, email, contactType } = req.body;
+    if (!name || !phoneNumber || !email || !contactType) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-router.get(
-  '/:contactId',
-  isValidId,
-  ctrlWrapper(contactsController.getContactById),
-);
+    const newContact = await Contact.create({
+      name,
+      phoneNumber,
+      email,
+      contactType,
+    });
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: newContact,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
-router.post(
-  '/',
-  upload.single('photo'), // Додаємо підтримку завантаження фото
-  validateBody(createContactSchema),
-  ctrlWrapper(contactsController.createContact),
-);
+// Оновити контакт (PATCH)
+router.patch('/:contactId', upload.none(), async (req, res) => {
+  try {
+    const { contactId } = req.params;
+    const updatedData = req.body;
 
-router.patch(
-  '/:contactId',
-  isValidId,
-  upload.single('photo'), // Додаємо підтримку оновлення фото
-  validateBody(updateContactSchema),
-  ctrlWrapper(contactsController.updateContact),
-);
+    const updatedContact = await Contact.findByIdAndUpdate(
+      contactId,
+      updatedData,
+      { new: true },
+    );
 
-router.delete(
-  '/:contactId',
-  isValidId,
-  ctrlWrapper(contactsController.deleteContact),
-);
+    if (!updatedContact) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    res.json({
+      status: 200,
+      message: 'Successfully updated the contact!',
+      data: updatedContact,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
+// Видалити контакт (DELETE)
+router.delete('/:contactId', async (req, res) => {
+  try {
+    const { contactId } = req.params;
+    const deletedContact = await Contact.findByIdAndDelete(contactId);
+
+    if (!deletedContact) {
+      return res.status(404).json({ message: 'Contact not found' });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
 
 export default router;

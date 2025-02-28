@@ -2,35 +2,122 @@ openapi: 3.1.0
 info:
   version: 1.0.0
   title: Contacts Manager App
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  description: Contacts operations
-
-tags:
-  - name: Contacts
-    description: Operations with contacts
+  description: API для керування контактами
 
 servers:
   - url: http://localhost:3000
-  - url: https://hw7-swagger-qzew.onrender.com
 
 paths:
   /contacts:
-    get:
-      $ref: '../swagger/paths/contacts/get.yaml'
     post:
-      $ref: '../swagger/paths/contacts/post.yaml'
+      summary: Створити новий контакт
+      operationId: createContact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Ім'я контакту
+                phoneNumber:
+                  type: string
+                  description: Номер телефону
+                email:
+                  type: string
+                  description: Email
+                contactType:
+                  type: string
+                  enum: [work, personal, home]
+      responses:
+        201:
+          description: Успішно створено контакт
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Successfully created a contact!
+                  data:
+                    $ref: "#/components/schemas/Contact"
+
   /contacts/{id}:
-    get:
-      $ref: '../swagger/paths/contacts/{id}/get.yaml'
     patch:
-      $ref: '../swagger/paths/contacts/{id}/patch.yaml'
+      summary: Оновити контакт
+      operationId: updateContact
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Ім'я контакту
+                phoneNumber:
+                  type: string
+                  description: Номер телефону
+                email:
+                  type: string
+                  description: Email
+                contactType:
+                  type: string
+                  enum: [work, personal, home]
+      responses:
+        200:
+          description: Успішно оновлено контакт
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Successfully updated the contact!
+                  data:
+                    $ref: "#/components/schemas/Contact"
+
     delete:
-      $ref: '../swagger/paths/contacts/{id}/delete.yaml'
+      summary: Видалити контакт
+      operationId: deleteContact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Контакт успішно видалено
 
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
+  schemas:
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "67ca67e7ae7f10c25b566655"
+        name:
+          type: string
+          example: "Іван Петров"
+        phoneNumber:
+          type: string
+          example: "+380975554532"
+        email:
+          type: string
+          example: "ivanpele@gmail.com"
+        contactType:
+          type: string
+          enum: [work, personal, home]
