@@ -9,16 +9,41 @@ const router = Router();
 // Отримати всі контакти
 router.get('/', async (req, res) => {
   try {
-    // Якщо потрібно, можна відфільтрувати контакти за userId
     const contacts = await Contact.find();
+    if (!contacts || contacts.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: 'No contacts found',
+        data: [],
+      });
+    }
     res.json({
       status: 200,
       message: 'Successfully found contacts!',
       data: contacts,
     });
   } catch (error) {
-    console.error('Error fetching contacts:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ status: 500, message: 'Internal Server Error' });
+  }
+});
+
+// Отримати контакт за id
+router.get('/:contactId', async (req, res) => {
+  try {
+    const contact = await Contact.findById(req.params.contactId);
+    if (!contact) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+      });
+    }
+    res.json({
+      status: 200,
+      message: `Successfully found contact with id ${req.params.contactId}!`,
+      data: contact,
+    });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'Internal Server Error' });
   }
 });
 
@@ -28,28 +53,34 @@ router.post('/', async (req, res) => {
     const { name, phoneNumber, email, contactType } = req.body;
     if (!name || !phoneNumber) {
       return res.status(400).json({
+        status: 400,
         message: 'Missing required fields: name and phoneNumber are required',
       });
     }
 
-    // Отримуємо userId з токена
+    // Отримуємо userId з токена з заголовка Authorization
     let userId;
-    if (req.headers.authorization) {
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer ')
+    ) {
       const token = req.headers.authorization.split(' ')[1];
-      // Для перевірки токена краще використати jwt.verify(token, secret)
       const decoded = jwt.decode(token);
       userId = decoded?.userId;
     }
     if (!userId) {
-      return res.status(400).json({ message: 'Missing userId from token' });
+      return res.status(400).json({
+        status: 400,
+        message: 'Missing userId from token',
+      });
     }
 
     const newContact = await Contact.create({
       name,
       phoneNumber,
-      email, // може бути undefined – це нормально
-      contactType, // якщо не передано – використовується значення за замовчуванням
-      userId, // додаємо отриманий userId
+      email, // Якщо email не передається – значення undefined, що прийнятне
+      contactType, // Якщо contactType не передається – використовується значення за замовчуванням
+      userId, // Додаємо обов’язковий userId
     });
     res.status(201).json({
       status: 201,
@@ -58,11 +89,11 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Error creating contact:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ status: 500, message: 'Internal Server Error' });
   }
 });
 
-// Оновити контакт (PATCH)
+// Оновити контакт (PATCH) – очікується multipart/form-data
 router.patch('/:contactId', upload.none(), async (req, res) => {
   try {
     const { contactId } = req.params;
@@ -71,11 +102,16 @@ router.patch('/:contactId', upload.none(), async (req, res) => {
     const updatedContact = await Contact.findByIdAndUpdate(
       contactId,
       updatedData,
-      { new: true },
+      {
+        new: true,
+      },
     );
 
     if (!updatedContact) {
-      return res.status(404).json({ message: 'Contact not found' });
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+      });
     }
 
     res.json({
@@ -84,8 +120,7 @@ router.patch('/:contactId', upload.none(), async (req, res) => {
       data: updatedContact,
     });
   } catch (error) {
-    console.error('Error updating contact:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ status: 500, message: 'Internal Server Error' });
   }
 });
 
@@ -96,13 +131,16 @@ router.delete('/:contactId', async (req, res) => {
     const deletedContact = await Contact.findByIdAndDelete(contactId);
 
     if (!deletedContact) {
-      return res.status(404).json({ message: 'Contact not found' });
+      return res.status(404).json({
+        status: 404,
+        message: 'Contact not found',
+      });
     }
 
+    // 204 статус – без тіла відповіді
     res.status(204).send();
   } catch (error) {
-    console.error('Error deleting contact:', error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ status: 500, message: 'Internal Server Error' });
   }
 });
 

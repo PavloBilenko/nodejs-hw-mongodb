@@ -6,15 +6,12 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   description: Contacts operations
-
-tags:
-  - name: Contacts
-    description: Операції з контактами
-
 servers:
   - url: http://localhost:3000
   - url: https://hw7-swagger-qzew.onrender.com
-
+tags:
+  - name: Contacts
+    description: Операції з контактами
 paths:
   /contacts:
     get:
@@ -45,7 +42,7 @@ paths:
             enum: [asc, desc]
             example: "asc"
       responses:
-        200:
+        '200':
           description: Список контактів
           content:
             application/json:
@@ -61,14 +58,15 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Contact"
-        400:
-          $ref: "#/components/responses/BadRequest"
-        401:
-          $ref: "#/components/responses/Unauthorized"
-        500:
-          $ref: "#/components/responses/ServerError"
-
+                      $ref: '#/components/schemas/Contact'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
     post:
       tags:
         - Contacts
@@ -83,37 +81,34 @@ paths:
               required:
                 - name
                 - phoneNumber
-                - email
-                - contactType
               properties:
                 name:
                   type: string
-                  description: Ім'я контакту
+                  description: "Ім'я контакту"
                   example: "Іван Петров"
                 phoneNumber:
                   type: string
-                  description: Номер телефону
+                  description: "Номер телефону"
                   example: "+380975554532"
                 email:
                   type: string
-                  description: Email
+                  description: "Email"
                   example: "ivanpele@gmail.com"
                 contactType:
                   type: string
                   enum: [work, personal, home]
                   example: "work"
       responses:
-        201:
+        '201':
           description: Успішно створено контакт
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        400:
-          $ref: "#/components/responses/BadRequest"
-        500:
-          $ref: "#/components/responses/ServerError"
-
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /contacts/{id}:
     get:
       tags:
@@ -128,17 +123,16 @@ paths:
             type: string
             example: "67ca67e7ae7f10c25b566655"
       responses:
-        200:
+        '200':
           description: Знайдено контакт
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        404:
-          $ref: "#/components/responses/NotFound"
-        500:
-          $ref: "#/components/responses/ServerError"
-
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/ServerError'
     patch:
       tags:
         - Contacts
@@ -160,28 +154,27 @@ paths:
               properties:
                 name:
                   type: string
-                  description: Ім'я контакту
+                  description: "Ім'я контакту"
                 phoneNumber:
                   type: string
-                  description: Номер телефону
+                  description: "Номер телефону"
                 email:
                   type: string
-                  description: Email
+                  description: "Email"
                 contactType:
                   type: string
                   enum: [work, personal, home]
       responses:
-        200:
+        '200':
           description: Успішно оновлено контакт
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessResponse"
-        400:
-          $ref: "#/components/responses/BadRequest"
-        404:
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
         - Contacts
@@ -194,17 +187,15 @@ paths:
           schema:
             type: string
       responses:
-        204:
+        '204':
           description: Контакт успішно видалено
-        404:
-          $ref: "#/components/responses/NotFound"
-
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-
   schemas:
     Contact:
       type: object
@@ -224,7 +215,9 @@ components:
         contactType:
           type: string
           enum: [work, personal, home]
-
+        userId:
+          type: string
+          example: "67bfa7a9925aebdb493b5b33"
     SuccessResponse:
       type: object
       properties:
@@ -236,8 +229,7 @@ components:
           example: "Operation successful"
         data:
           type: object
-          $ref: "#/components/schemas/Contact"
-
+          $ref: '#/components/schemas/Contact'
   responses:
     BadRequest:
       description: Невірний запит
@@ -252,7 +244,6 @@ components:
               message:
                 type: string
                 example: "Bad request"
-
     Unauthorized:
       description: Неавторизовано
       content:
@@ -266,7 +257,6 @@ components:
               message:
                 type: string
                 example: "Unauthorized"
-
     NotFound:
       description: Не знайдено
       content:
@@ -280,7 +270,6 @@ components:
               message:
                 type: string
                 example: "Not found"
-
     ServerError:
       description: Внутрішня помилка сервера
       content:
