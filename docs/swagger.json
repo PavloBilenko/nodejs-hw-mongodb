@@ -20,34 +20,97 @@
   "tags": [
     {
       "name": "Contacts",
-      "description": "Operations with contacts"
+      "description": "Операції з контактами"
     }
   ],
   "paths": {
     "/contacts": {
       "get": {
+        "tags": [
+          "Contacts"
+        ],
         "summary": "Отримати всі контакти",
         "operationId": "getAllContacts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "example": "name"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "example": "asc"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Список контактів",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Contact"
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Contacts retrieved successfully"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Contact"
+                      }
+                    }
                   }
                 }
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
           "500": {
-            "description": "Внутрішня помилка сервера"
+            "$ref": "#/components/responses/ServerError"
           }
         }
       },
       "post": {
+        "tags": [
+          "Contacts"
+        ],
         "summary": "Створити новий контакт",
         "operationId": "createContact",
         "requestBody": {
@@ -65,15 +128,18 @@
                 "properties": {
                   "name": {
                     "type": "string",
-                    "description": "Ім'я контакту"
+                    "description": "Ім'я контакту",
+                    "example": "Іван Петров"
                   },
                   "phoneNumber": {
                     "type": "string",
-                    "description": "Номер телефону"
+                    "description": "Номер телефону",
+                    "example": "+380975554532"
                   },
                   "email": {
                     "type": "string",
-                    "description": "Email"
+                    "description": "Email",
+                    "example": "ivanpele@gmail.com"
                   },
                   "contactType": {
                     "type": "string",
@@ -81,7 +147,8 @@
                       "work",
                       "personal",
                       "home"
-                    ]
+                    ],
+                    "example": "work"
                   }
                 }
               }
@@ -94,16 +161,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Contact"
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
           }
         }
       }
     },
     "/contacts/{id}": {
       "get": {
+        "tags": [
+          "Contacts"
+        ],
         "summary": "Отримати контакт за ID",
         "operationId": "getContactById",
         "parameters": [
@@ -123,20 +199,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Contact"
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Контакт не знайдено"
+            "$ref": "#/components/responses/NotFound"
           },
           "500": {
-            "description": "Внутрішня помилка сервера"
+            "$ref": "#/components/responses/ServerError"
           }
         }
       },
       "patch": {
+        "tags": [
+          "Contacts"
+        ],
         "summary": "Оновити контакт",
         "operationId": "updateContact",
         "parameters": [
@@ -188,14 +267,23 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Contact"
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "delete": {
+        "tags": [
+          "Contacts"
+        ],
         "summary": "Видалити контакт",
         "operationId": "deleteContact",
         "parameters": [
@@ -211,6 +299,9 @@
         "responses": {
           "204": {
             "description": "Контакт успішно видалено"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -250,6 +341,105 @@
               "personal",
               "home"
             ]
+          }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 200
+          },
+          "message": {
+            "type": "string",
+            "example": "Operation successful"
+          },
+          "data": {
+            "type": "object",
+            "$ref": "#/components/schemas/Contact"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Невірний запит",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 400
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Bad request"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Неавторизовано",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Не знайдено",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 404
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Not found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Внутрішня помилка сервера",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error"
+                }
+              }
+            }
           }
         }
       }
