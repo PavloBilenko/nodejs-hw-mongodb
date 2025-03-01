@@ -16,7 +16,7 @@ const contactSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    photo: { type: String, default: '' }, // Додано поле фото
+    photo: { type: String, default: '' },
   },
   { timestamps: true },
 );

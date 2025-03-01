@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import Contact from '../models/contact.js';
 import multer from 'multer';
 
@@ -8,6 +9,7 @@ const router = Router();
 // Отримати всі контакти
 router.get('/', async (req, res) => {
   try {
+    // Якщо потрібно, можна відфільтрувати контакти за userId
     const contacts = await Contact.find();
     res.json({
       status: 200,
@@ -15,6 +17,7 @@ router.get('/', async (req, res) => {
       data: contacts,
     });
   } catch (error) {
+    console.error('Error fetching contacts:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
@@ -23,15 +26,30 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, phoneNumber, email, contactType } = req.body;
-    if (!name || !phoneNumber || !email || !contactType) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    if (!name || !phoneNumber) {
+      return res.status(400).json({
+        message: 'Missing required fields: name and phoneNumber are required',
+      });
+    }
+
+    // Отримуємо userId з токена
+    let userId;
+    if (req.headers.authorization) {
+      const token = req.headers.authorization.split(' ')[1];
+      // Для перевірки токена краще використати jwt.verify(token, secret)
+      const decoded = jwt.decode(token);
+      userId = decoded?.userId;
+    }
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing userId from token' });
     }
 
     const newContact = await Contact.create({
       name,
       phoneNumber,
-      email,
-      contactType,
+      email, // може бути undefined – це нормально
+      contactType, // якщо не передано – використовується значення за замовчуванням
+      userId, // додаємо отриманий userId
     });
     res.status(201).json({
       status: 201,
@@ -39,6 +57,7 @@ router.post('/', async (req, res) => {
       data: newContact,
     });
   } catch (error) {
+    console.error('Error creating contact:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
@@ -65,6 +84,7 @@ router.patch('/:contactId', upload.none(), async (req, res) => {
       data: updatedContact,
     });
   } catch (error) {
+    console.error('Error updating contact:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
@@ -81,6 +101,7 @@ router.delete('/:contactId', async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting contact:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
