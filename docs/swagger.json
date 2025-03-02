@@ -133,38 +133,39 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["name", "phoneNumber"],
+                "required": ["name", "phoneNumber", "contactType"],
                 "properties": {
                   "name": {
                     "type": "string",
                     "description": "Ім'я контакту",
-                    "example": "Іван Петров"
+                    "example": "John Doe"
                   },
                   "phoneNumber": {
                     "type": "string",
                     "description": "Номер телефону",
-                    "example": "+380975554532"
+                    "example": "+380987654321"
                   },
                   "email": {
                     "type": "string",
                     "description": "Email",
-                    "example": "ivanpele@gmail.com"
+                    "example": "JohnDoe123@gmail.com"
                   },
                   "contactType": {
                     "type": "string",
                     "enum": ["work", "personal", "home"],
                     "description": "Тип контакту",
-                    "example": "work"
+                    "example": "personal"
                   },
                   "photo": {
                     "type": "string",
                     "description": "URL або base64 зображення",
+                    "format": "binary",
                     "example": ""
                   },
                   "isFavourite": {
                     "type": "boolean",
                     "description": "Позначка, чи є контакт улюбленим",
-                    "example": true
+                    "example": false
                   }
                 }
               }
@@ -266,7 +267,8 @@
                   },
                   "photo": {
                     "type": "string",
-                    "description": "URL або base64 зображення"
+                    "description": "URL або base64 зображення",
+                    "format": "binary"
                   },
                   "isFavourite": {
                     "type": "boolean",
@@ -338,7 +340,7 @@
           },
           "name": {
             "type": "string",
-            "example": "Іван Петров"
+            "example": "John Doe"
           },
           "phoneNumber": {
             "type": "string",
@@ -346,19 +348,21 @@
           },
           "email": {
             "type": "string",
-            "example": "ivanpele@gmail.com"
+            "example": "JohnDoe123@gmail.com"
           },
           "contactType": {
             "type": "string",
-            "enum": ["work", "personal", "home"]
+            "enum": ["work", "personal", "home"],
+            "example": "personal"
           },
           "photo": {
             "type": "string",
+            "format": "binary",
             "example": ""
           },
           "isFavourite": {
             "type": "boolean",
-            "example": true
+            "example": false
           },
           "userId": {
             "type": "string",

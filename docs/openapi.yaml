@@ -84,6 +84,9 @@ paths:
         - Contacts
       summary: Створити новий контакт
       operationId: createContact
+      description: "Create a contact with payload"
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -93,35 +96,35 @@ paths:
               required:
                 - name
                 - phoneNumber
+                - contactType
               properties:
                 name:
+                  description: "Contact's name"
                   type: string
-                  description: "Ім'я контакту"
-                  example: "Іван Петров"
+                  example: "John Doe"
                 phoneNumber:
+                  description: "Contact's phone number"
                   type: string
-                  description: "Номер телефону"
-                  example: "+380975554532"
+                  example: "+380987654321"
                 email:
+                  description: "Contact's email"
                   type: string
-                  description: "Email"
-                  example: "ivanpele@gmail.com"
+                  example: "JohnDoe123@gmail.com"
                 contactType:
+                  description: "Contact's contact type"
                   type: string
-                  enum: [work, personal, home]
-                  description: "Тип контакту"
-                  example: "work"
-                photo:
-                  type: string
-                  description: "URL або base64 зображення"
-                  example: ""
+                  example: "personal"
                 isFavourite:
+                  description: "Contact's isFavourite"
                   type: boolean
-                  description: "Позначка, чи є контакт улюбленим"
-                  example: true
+                  example: false
+                photo:
+                  description: "Contact's photo"
+                  type: string
+                  format: binary
       responses:
         '201':
-          description: Успішно створено контакт
+          description: "Creates a contact"
           content:
             application/json:
               schema:
@@ -145,7 +148,7 @@ paths:
             example: "67ca67e7ae7f10c25b566655"
       responses:
         '200':
-          description: Знайдено контакт
+          description: "Знайдено контакт"
           content:
             application/json:
               schema:
@@ -174,26 +177,28 @@ paths:
               type: object
               properties:
                 name:
+                  description: "Contact's name"
                   type: string
-                  description: "Ім'я контакту"
                 phoneNumber:
+                  description: "Contact's phone number"
                   type: string
-                  description: "Номер телефону"
                 email:
+                  description: "Contact's email"
                   type: string
-                  description: "Email"
                 contactType:
+                  description: "Contact's contact type"
                   type: string
                   enum: [work, personal, home]
-                photo:
-                  type: string
-                  description: "URL або base64 зображення"
                 isFavourite:
+                  description: "Contact's isFavourite"
                   type: boolean
-                  description: "Позначка, чи є контакт улюбленим"
+                photo:
+                  description: "Contact's photo"
+                  type: string
+                  format: binary
       responses:
         '200':
-          description: Успішно оновлено контакт
+          description: "Successfully patched a contact!"
           content:
             application/json:
               schema:
@@ -215,7 +220,7 @@ paths:
             type: string
       responses:
         '204':
-          description: Контакт успішно видалено
+          description: "Контакт успішно видалено"
         '404':
           $ref: '#/components/responses/NotFound'
 components:
@@ -232,22 +237,24 @@ components:
           example: "67ca67e7ae7f10c25b566655"
         name:
           type: string
-          example: "Іван Петров"
+          example: "John Doe"
         phoneNumber:
           type: string
-          example: "+380975554532"
+          example: "+380987654321"
         email:
           type: string
-          example: "ivanpele@gmail.com"
+          example: "JohnDoe123@gmail.com"
         contactType:
           type: string
           enum: [work, personal, home]
-        photo:
-          type: string
-          example: ""
+          example: "personal"
         isFavourite:
           type: boolean
-          example: true
+          example: false
+        photo:
+          type: string
+          format: binary
+          example: ""
         userId:
           type: string
           example: "67bfa7a9925aebdb493b5b33"
@@ -277,7 +284,7 @@ components:
           $ref: '#/components/schemas/Contact'
   responses:
     BadRequest:
-      description: Невірний запит
+      description: "Невірний запит"
       content:
         application/json:
           schema:
@@ -290,7 +297,7 @@ components:
                 type: string
                 example: "Bad request"
     Unauthorized:
-      description: Неавторизовано
+      description: "Неавторизовано"
       content:
         application/json:
           schema:
@@ -303,7 +310,7 @@ components:
                 type: string
                 example: "Unauthorized"
     NotFound:
-      description: Не знайдено
+      description: "Не знайдено"
       content:
         application/json:
           schema:
@@ -316,7 +323,7 @@ components:
                 type: string
                 example: "Not found"
     ServerError:
-      description: Внутрішня помилка сервера
+      description: "Внутрішня помилка сервера"
       content:
         application/json:
           schema:

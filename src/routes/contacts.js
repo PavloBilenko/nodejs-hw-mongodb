@@ -6,37 +6,11 @@ import multer from 'multer';
 const upload = multer();
 const router = Router();
 
-// Отримати всі контакти з підтримкою фільтрації, сортування та пагінації
+// Отримати всі контакти
 router.get('/', async (req, res) => {
   try {
-    const { page, perPage, sortBy, sortOrder, type, isFavourite } = req.query;
-    const filter = {};
-
-    // Якщо задано фільтрацію за типом контакту
-    if (type) {
-      filter.contactType = type;
-    }
-    // Якщо задано фільтрацію за isFavourite
-    if (typeof isFavourite !== 'undefined') {
-      filter.isFavourite = isFavourite === 'true';
-    }
-
-    let query = Contact.find(filter);
-
-    // Сортування: якщо вказано sortBy, використовуємо sortOrder (за замовчуванням asc)
-    if (sortBy) {
-      const order = sortOrder && sortOrder.toLowerCase() === 'desc' ? -1 : 1;
-      query = query.sort({ [sortBy]: order });
-    }
-
-    // Пагінація: якщо передано page та perPage
-    if (page && perPage) {
-      const p = parseInt(page);
-      const pp = parseInt(perPage);
-      query = query.skip((p - 1) * pp).limit(pp);
-    }
-
-    const contacts = await query;
+    // Якщо ви додали логіку фільтрації чи сортування, вона йде тут.
+    const contacts = await Contact.find();
     if (!contacts || contacts.length === 0) {
       return res.status(404).json({
         status: 404,
@@ -74,17 +48,21 @@ router.get('/:contactId', async (req, res) => {
   }
 });
 
-// Створити новий контакт
-router.post('/', async (req, res) => {
+// Створити новий контакт (POST) – очікується multipart/form-data
+router.post('/', upload.none(), async (req, res) => {
   try {
-    const { name, phoneNumber, email, contactType } = req.body;
-    if (!name || !phoneNumber) {
+    const { name, phoneNumber, contactType, email, isFavourite } = req.body;
+
+    // Перевірка обов'язкових полів
+    if (!name || !phoneNumber || !contactType) {
       return res.status(400).json({
         status: 400,
-        message: 'Missing required fields: name and phoneNumber are required',
+        message:
+          'Missing required fields: name, phoneNumber, and contactType are required',
       });
     }
-    // Отримуємо userId з токена з заголовка Authorization
+
+    // Отримуємо userId з токена
     let userId;
     if (
       req.headers.authorization &&
@@ -100,13 +78,17 @@ router.post('/', async (req, res) => {
         message: 'Missing userId from token',
       });
     }
+
+    // Створюємо новий контакт
     const newContact = await Contact.create({
       name,
       phoneNumber,
-      email,
       contactType,
+      email,
+      isFavourite,
       userId,
     });
+
     res.status(201).json({
       status: 201,
       message: 'Successfully created a contact!',
@@ -123,19 +105,20 @@ router.patch('/:contactId', upload.none(), async (req, res) => {
   try {
     const { contactId } = req.params;
     const updatedData = req.body;
+
     const updatedContact = await Contact.findByIdAndUpdate(
       contactId,
       updatedData,
-      {
-        new: true,
-      },
+      { new: true },
     );
+
     if (!updatedContact) {
       return res.status(404).json({
         status: 404,
         message: 'Contact not found',
       });
     }
+
     res.json({
       status: 200,
       message: 'Successfully updated the contact!',
@@ -151,12 +134,15 @@ router.delete('/:contactId', async (req, res) => {
   try {
     const { contactId } = req.params;
     const deletedContact = await Contact.findByIdAndDelete(contactId);
+
     if (!deletedContact) {
       return res.status(404).json({
         status: 404,
         message: 'Contact not found',
       });
     }
+
+    // 204 статус – без тіла відповіді
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ status: 500, message: 'Internal Server Error' });
