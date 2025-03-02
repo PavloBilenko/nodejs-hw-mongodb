@@ -11,10 +11,10 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000"
+      "url": "https://hw7-swagger-qzew.onrender.com"
     },
     {
-      "url": "https://hw7-swagger-qzew.onrender.com"
+      "url": "http://localhost:3000"
     }
   ],
   "tags": [
@@ -112,7 +112,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "required": ["name", "phoneNumber"],
@@ -135,7 +135,18 @@
                   "contactType": {
                     "type": "string",
                     "enum": ["work", "personal", "home"],
+                    "description": "Тип контакту",
                     "example": "work"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "description": "URL або base64 зображення",
+                    "example": ""
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "description": "Позначка, чи є контакт улюбленим",
+                    "example": true
                   }
                 }
               }
@@ -234,6 +245,14 @@
                   "contactType": {
                     "type": "string",
                     "enum": ["work", "personal", "home"]
+                  },
+                  "photo": {
+                    "type": "string",
+                    "description": "URL або base64 зображення"
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "description": "Позначка, чи є контакт улюбленим"
                   }
                 }
               }
@@ -314,6 +333,14 @@
           "contactType": {
             "type": "string",
             "enum": ["work", "personal", "home"]
+          },
+          "photo": {
+            "type": "string",
+            "example": ""
+          },
+          "isFavourite": {
+            "type": "boolean",
+            "example": true
           },
           "userId": {
             "type": "string",

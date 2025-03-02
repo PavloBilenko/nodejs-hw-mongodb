@@ -6,15 +6,12 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   description: Contacts operations
-
 servers:
-  - url: http://localhost:3000
   - url: https://hw7-swagger-qzew.onrender.com
-
+  - url: http://localhost:3000
 tags:
   - name: Contacts
     description: Операції з контактами
-
 paths:
   /contacts:
     get:
@@ -79,7 +76,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
@@ -101,7 +98,16 @@ paths:
                 contactType:
                   type: string
                   enum: [work, personal, home]
+                  description: "Тип контакту"
                   example: "work"
+                photo:
+                  type: string
+                  description: "URL або base64 зображення"
+                  example: ""
+                isFavourite:
+                  type: boolean
+                  description: "Позначка, чи є контакт улюбленим"
+                  example: true
       responses:
         '201':
           description: Успішно створено контакт
@@ -170,6 +176,12 @@ paths:
                 contactType:
                   type: string
                   enum: [work, personal, home]
+                photo:
+                  type: string
+                  description: "URL або base64 зображення"
+                isFavourite:
+                  type: boolean
+                  description: "Позначка, чи є контакт улюбленим"
       responses:
         '200':
           description: Успішно оновлено контакт
@@ -224,6 +236,12 @@ components:
         contactType:
           type: string
           enum: [work, personal, home]
+        photo:
+          type: string
+          example: ""
+        isFavourite:
+          type: boolean
+          example: true
         userId:
           type: string
           example: "67bfa7a9925aebdb493b5b33"
@@ -241,7 +259,6 @@ components:
           type: object
           $ref: '#/components/schemas/Contact'
 
-    # Окрема схема для створення (201)
     SuccessCreatedResponse:
       type: object
       properties:
@@ -269,7 +286,6 @@ components:
               message:
                 type: string
                 example: "Bad request"
-
     Unauthorized:
       description: Неавторизовано
       content:
@@ -283,7 +299,6 @@ components:
               message:
                 type: string
                 example: "Unauthorized"
-
     NotFound:
       description: Не знайдено
       content:
@@ -297,7 +312,6 @@ components:
               message:
                 type: string
                 example: "Not found"
-
     ServerError:
       description: Внутрішня помилка сервера
       content:
