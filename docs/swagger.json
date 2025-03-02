@@ -62,6 +62,24 @@
               "enum": ["asc", "desc"],
               "example": "asc"
             }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Фільтрація за типом контакту",
+            "schema": {
+              "type": "string",
+              "example": "work"
+            }
+          },
+          {
+            "name": "isFavourite",
+            "in": "query",
+            "description": "Фільтрація за позначкою улюбленості (true/false)",
+            "schema": {
+              "type": "string",
+              "example": "true"
+            }
           }
         ],
         "responses": {

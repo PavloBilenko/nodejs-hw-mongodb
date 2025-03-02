@@ -41,6 +41,18 @@ paths:
             type: string
             enum: [asc, desc]
             example: "asc"
+        - name: type
+          in: query
+          description: "Фільтрація за типом контакту"
+          schema:
+            type: string
+            example: "work"
+        - name: isFavourite
+          in: query
+          description: "Фільтрація за позначкою улюбленості (true/false)"
+          schema:
+            type: string
+            example: "true"
       responses:
         '200':
           description: Список контактів
@@ -67,7 +79,6 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
-
     post:
       tags:
         - Contacts
@@ -119,7 +130,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
-
   /contacts/{id}:
     get:
       tags:
@@ -144,7 +154,6 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
-
     patch:
       tags:
         - Contacts
@@ -193,7 +202,6 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-
     delete:
       tags:
         - Contacts
@@ -210,13 +218,11 @@ paths:
           description: Контакт успішно видалено
         '404':
           $ref: '#/components/responses/NotFound'
-
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-
   schemas:
     Contact:
       type: object
@@ -245,7 +251,6 @@ components:
         userId:
           type: string
           example: "67bfa7a9925aebdb493b5b33"
-
     SuccessResponse:
       type: object
       properties:
@@ -258,7 +263,6 @@ components:
         data:
           type: object
           $ref: '#/components/schemas/Contact'
-
     SuccessCreatedResponse:
       type: object
       properties:
@@ -271,7 +275,6 @@ components:
         data:
           type: object
           $ref: '#/components/schemas/Contact'
-
   responses:
     BadRequest:
       description: Невірний запит
