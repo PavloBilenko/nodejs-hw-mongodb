@@ -6,12 +6,15 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   description: Contacts operations
+
 servers:
   - url: http://localhost:3000
   - url: https://hw7-swagger-qzew.onrender.com
+
 tags:
   - name: Contacts
     description: Операції з контактами
+
 paths:
   /contacts:
     get:
@@ -67,6 +70,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/ServerError'
+
     post:
       tags:
         - Contacts
@@ -104,11 +108,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: '#/components/schemas/SuccessCreatedResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/ServerError'
+
   /contacts/{id}:
     get:
       tags:
@@ -133,6 +138,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/ServerError'
+
     patch:
       tags:
         - Contacts
@@ -175,6 +181,7 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+
     delete:
       tags:
         - Contacts
@@ -191,11 +198,13 @@ paths:
           description: Контакт успішно видалено
         '404':
           $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+
   schemas:
     Contact:
       type: object
@@ -218,6 +227,7 @@ components:
         userId:
           type: string
           example: "67bfa7a9925aebdb493b5b33"
+
     SuccessResponse:
       type: object
       properties:
@@ -230,6 +240,21 @@ components:
         data:
           type: object
           $ref: '#/components/schemas/Contact'
+
+    # Окрема схема для створення (201)
+    SuccessCreatedResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: "Successfully created a contact!"
+        data:
+          type: object
+          $ref: '#/components/schemas/Contact'
+
   responses:
     BadRequest:
       description: Невірний запит
@@ -244,6 +269,7 @@ components:
               message:
                 type: string
                 example: "Bad request"
+
     Unauthorized:
       description: Неавторизовано
       content:
@@ -257,6 +283,7 @@ components:
               message:
                 type: string
                 example: "Unauthorized"
+
     NotFound:
       description: Не знайдено
       content:
@@ -270,6 +297,7 @@ components:
               message:
                 type: string
                 example: "Not found"
+
     ServerError:
       description: Внутрішня помилка сервера
       content:

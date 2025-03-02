@@ -148,7 +148,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SuccessResponse"
+                  "$ref": "#/components/schemas/SuccessCreatedResponse"
                 }
               }
             }
@@ -331,6 +331,23 @@
           "message": {
             "type": "string",
             "example": "Operation successful"
+          },
+          "data": {
+            "type": "object",
+            "$ref": "#/components/schemas/Contact"
+          }
+        }
+      },
+      "SuccessCreatedResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 201
+          },
+          "message": {
+            "type": "string",
+            "example": "Successfully created a contact!"
           },
           "data": {
             "type": "object",
